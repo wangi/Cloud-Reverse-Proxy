@@ -13,8 +13,7 @@ It derives from [N-Quan/Cloud-Reverse-Proxy](https://github.com/N-Quan/Cloud-Rev
 - Create domain name with record pointing to the Cloud Server's public ip.
 - A cloud server running Ubuntu 24.04 (AWS, Linode, Digital Ocean, etc..) with the following requirements:
     - Open TCP ports 80/443 (http(s)) and UDP port 55107
-- A Proxmox LXC container on your home network running Ubuntu 24.04
-    - I used 2 CPU, 1GB RAM, 512 swap, 8GB primary disk
+- A system on your local network - baremetal, VM, container, whatever (e.g. Proxmox LXC container running Ubuntu 24.04, with 2 CPU, 1GB RAM, 512 swap, 8GB primary disk)
 
 ## Steps
 ### 1. Cloud Installer
@@ -26,7 +25,7 @@ sudo ./cloud_installer.sh
 ```
 
 ### 2. Local Installer
-Run this script on your Local Machine and follow prompts.
+Setup Nginx Proxy Manager on the local machine. Then run this script and follow prompts.
 ```
 curl -s -o local_installer.sh https://raw.githubusercontent.com/wangi/Cloud-Reverse-Proxy/main/local_installer.sh
 chmod +x local_installer.sh
@@ -34,11 +33,11 @@ sudo ./local_installer.sh
 ```
 
 ### 3. Setup Nginx Proxy Manager (NPM)
-Follow the URL provided by the Local Installer to configure NPM.
+Follow the URL provided by the Local Installer to configure NPM. You can also add a Streams configuration to forward port 2222 to SSH port 22 on a local bastion / jump SSH server.
 
 # Network Topology
 ## Cloud Server
-Your domain sends http(s) traffic to the Cloud Server running WireGuard. The http(s) traffic gets forwarded to the Proxmox container in your home network via the WireGuard tunnel.
+Your domain sends http(s) traffic to the Cloud Server running WireGuard. The http(s) traffic gets forwarded to the Proxmox container in your home network via the WireGuard tunnel. Port 2222 is also forwarded, intended to be used as custom SSH port.
 
 ## Container running reverse proxy
 Receives tunneled http(s) traffic which hits Nginx Proxy Manager (NPM).
