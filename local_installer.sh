@@ -19,7 +19,7 @@ read -r vps_pubkey </dev/tty
 echo "Address = 192.168.4.2 
 [Peer] 
 PublicKey = $vps_pubkey 
-AllowedIPs = 192.168.4.1/32 
+AllowedIPs = 0.0.0.0/0 
 Endpoint = $vps_public_ip:55107 
 PersistentKeepalive = 25 " | sudo tee -a /etc/wireguard/wg0.conf >/dev/null
 
