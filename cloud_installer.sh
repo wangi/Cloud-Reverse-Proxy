@@ -14,13 +14,19 @@ read -r home_server_pubkey </dev/tty
 echo "ListenPort = 55107 
 Address = 192.168.4.1 
 
+# firewall allow
+PostUp = iptables -P FORWARD DROP
+PostUp = iptables -A FORWARD -i eth0 -o wg0 -p tcp --syn -m multiport --dports 80,443,9022 -m conntrack --ctstate NEW -j ACCEPT
+PostUp = iptables -A FORWARD -i eth0 -o wg0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+PostUp = iptables -A FORWARD -i wg0 -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+PostDown = iptables -P FORWARD ACCEPT
+PostDown = iptables -D FORWARD -i eth0 -o wg0 -p tcp --syn -m multiport --dports 80,443,9022 -m conntrack --ctstate NEW -j ACCEPT
+PostDown = iptables -D FORWARD -i eth0 -o wg0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+PostDown = iptables -D FORWARD -i wg0 -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
 # port forwarding
-PreUp = iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to-destination 192.168.4.2
-PreUp = iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j DNAT --to-destination 192.168.4.2
-PreUp = iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 9022 -j DNAT --to-destination 192.168.4.2
-PostDown = iptables -t nat -D PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to-destination 192.168.4.2
-PostDown = iptables -t nat -D PREROUTING -i eth0 -p tcp --dport 443 -j DNAT --to-destination 192.168.4.2
-PostDown = iptables -t nat -D PREROUTING -i eth0 -p tcp --dport 9022 -j DNAT --to-destination 192.168.4.2
+PreUp = iptables -t nat -A PREROUTING -i eth0 -p tcp -m multiport --dports 80,443,9022 -j DNAT --to-destination 192.168.4.2
+PostDown = iptables -t nat -D PREROUTING -i eth0 -p tcp -m multiport --dports 80,443,9022 -j DNAT --to-destination 192.168.4.2
 
 # masquerade outbound packets
 PreUp = iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE

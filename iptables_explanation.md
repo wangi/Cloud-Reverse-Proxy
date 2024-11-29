@@ -3,12 +3,10 @@
 See also https://www.procustodibus.com/blog/2022/09/wireguard-port-forward-from-internet/
 
 ## Forward traffic from eth0 to wg0 on specified ports
-- These rules perform Destination Network Address Translation (DNAT). Traffic on ports 80, 443 and 2222 arriving at eth0 is forwarded to the internal IP address 192.168.4.2. 
+- These rules perform Destination Network Address Translation (DNAT). Traffic on ports 80, 443 and 9022 arriving at eth0 is forwarded to the internal IP address 192.168.4.2. 
 - It's used to redirect incoming connections to a specific internal machine or service. 
 ```
-sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to-destination 192.168.4.2
-sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j DNAT --to-destination 192.168.4.2
-sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 9022 -j DNAT --to-destination 192.168.4.2
+sudo iptables -t nat -A PREROUTING -i eth0 -p tcp -m multiport --dports 80,443,9022 -j DNAT --to-destination 192.168.4.2
 ```
 
 ## Masquerade
