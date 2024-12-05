@@ -19,10 +19,12 @@ PostUp = iptables -P FORWARD DROP
 PostUp = iptables -A FORWARD -i eth0 -o wg0 -p tcp --syn -m multiport --dports 80,443,9022 -m conntrack --ctstate NEW -j ACCEPT
 PostUp = iptables -A FORWARD -i eth0 -o wg0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 PostUp = iptables -A FORWARD -i wg0 -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+PostUp = iptables -A FORWARD -i wg0 -o eth0 -p tcp -m multiport --dports 80,443 -j ACCEPT
 PostDown = iptables -P FORWARD ACCEPT
 PostDown = iptables -D FORWARD -i eth0 -o wg0 -p tcp --syn -m multiport --dports 80,443,9022 -m conntrack --ctstate NEW -j ACCEPT
 PostDown = iptables -D FORWARD -i eth0 -o wg0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 PostDown = iptables -D FORWARD -i wg0 -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+PostDown = iptables -D FORWARD -i wg0 -o eth0 -p tcp -m multiport --dports 80,443 -j ACCEPT
 
 # port forwarding
 PreUp = iptables -t nat -A PREROUTING -i eth0 -p tcp -m multiport --dports 80,443,9022 -j DNAT --to-destination 192.168.4.2
